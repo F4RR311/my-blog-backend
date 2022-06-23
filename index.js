@@ -4,9 +4,13 @@ import mongoose from "mongoose";
 const PORT = 3100;
 import {registerValidation} from './validation/auth.js'
 import {validationResult} from "express-validator";
+
+import checkAuth from './utils/checkAuth.js'
 import UserModel from './models/User.js'
+
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
+
 
 mongoose.connect('mongodb+srv://admin:wwwwww@cluster0.kafjq9l.mongodb.net/blog?retryWrites=true&w=majority'
 )
@@ -18,6 +22,7 @@ mongoose.connect('mongodb+srv://admin:wwwwww@cluster0.kafjq9l.mongodb.net/blog?r
     });
 const app = express();
 app.use(express.json());
+
 app.post('/auth/login', async (req, res) => {
     try {
         const user = await UserModel.findOne({email: req.body.email});
@@ -25,6 +30,7 @@ app.post('/auth/login', async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 message: 'Пользователь не найден'
+
             })
         }
 
@@ -53,6 +59,26 @@ app.post('/auth/login', async (req, res) => {
             message: 'Can`t авторизоваться'
         })
     }
+})
+
+app.get('/auth/me', checkAuth, async (req, res) => {
+    try {
+        const user = await UserModel.findById(req.userId)
+        if (!user) {
+            return res.status(404).json({
+                message: 'Polbzovatelb ne naiden',
+            })
+        }
+        const {passwordHash, ...userData} = user._doc
+        res.json(userData)
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            message: 'Нет доступа'
+        })
+    }
+
 })
 
 app.post('/auth/register', registerValidation, async (req, res) => {
