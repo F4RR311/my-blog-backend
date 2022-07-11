@@ -2,7 +2,6 @@ import express from 'express';
 import mongoose from "mongoose";
 import multer from 'multer';
 
-const PORT = 3100;
 import {registerValidation, loginValidation, postCreateValidation} from './validadtions.js'
 import {UserController, PostController} from './controllers/index.js'
 import {validationErrors, checkAuth} from "./utils/index.js";
@@ -32,6 +31,7 @@ const upload = multer({storage})
 
 const app = express();
 
+// TODO добавить деплой проекта на Herocy.
 app.use(express.json());
 app.use(cors())
 app.use('/uploads', express.static('uploads'))
